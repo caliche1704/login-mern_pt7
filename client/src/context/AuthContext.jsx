@@ -1,8 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { loginRequest, registerRequest, verifyTokenRequest } from "../api/auth";
 import Cookies from 'js-cookie';
-import { set } from "mongoose";
-
 
 export const AuthContext = createContext();
 
@@ -18,6 +16,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticathed, setIsAuthenticated] = useState(false);
     const [errors, setErrors] = useState([]);
+    const [loading, setLoading] =useState(true);
 
 
     const signup = async (user) => {
@@ -42,14 +41,16 @@ export const AuthProvider = ({ children }) => {
             if(Array.isArray(error.response.data)){
                 setErrors(error.response.data)
             }
-            setErrors(error.response.data.message)
+            setErrors([error.response.data.message]);
         }
     }
     useEffect(()=>{
+        if(errors.length > 0){
         const timer = setTimeout(()=>{
             setErrors([])
         },5000)
     return()=>clearTimeout(timer)
+    }
 },[errors]);
 
 useEffect(()=>{
@@ -57,7 +58,8 @@ useEffect(()=>{
     {
     const cookies = Cookies.get();
     if(!cookies.token){
-        setIsAuthenticated(false);
+        setIsAuthenticated(false)
+        setLoading(false)
         return setUser(null)
     }
     try {
@@ -65,13 +67,17 @@ useEffect(()=>{
         console.log(res)
         if(!res.data){
             setIsAuthenticated(false);
+            setLoading(false);
+            return;
         }
         setIsAuthenticated(true);
         setUser(res.data);
+        setLoading(false)
 
     } catch (error) {
         setIsAuthenticated(false);
         setUser(null);
+        setLoading(false)
     }
     }
     checkLogin();
@@ -83,7 +89,8 @@ useEffect(()=>{
             signin,
             user,
             isAuthenticathed,
-            errors
+            errors, 
+            loading
         }}>
             {children}
         </AuthContext.Provider>

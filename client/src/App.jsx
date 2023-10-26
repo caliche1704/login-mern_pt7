@@ -2,15 +2,18 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import { AuthProvider } from './context/AuthContext'
-import TaskPage from './pages/TaskPage'
 import TaskFormPage from './pages/TaskFormPage'
 import ProfilePage from './pages/ProfilePage'
 import HomePage from './pages/HomePage'
 import ProtectedRoute from './ProtectedRoute'
+import TaskPage from './pages/TaskPage'
+import { TaskProvider } from './context/TaskContext'
 function App() {
   return (
     <>
     <AuthProvider>
+      <TaskProvider>
+
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<HomePage/>} />
@@ -26,6 +29,7 @@ function App() {
 
         </Routes>
       </BrowserRouter>
+      </TaskProvider>
     </AuthProvider>
     </>
   )
